@@ -1,81 +1,107 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- HEADER -->
+  <div class="min-h-screen bg-[#fcfdfe] text-gray-900 overflow-x-hidden">
     <AppHeader />
 
-    <!-- HERO / PAGE HEADER -->
-    <section class="bg-royal-blue text-white py-20 mt-16">
-      <div class="max-w-7xl mx-auto px-6 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">Latest News & Updates</h1>
-        <p class="text-lg md:text-xl max-w-3xl mx-auto">
-          Stay informed with our latest news, announcements, and updates from Alina Agent Service.
+    <section class="relative bg-[#001f3f] py-32 mt-16 overflow-hidden">
+      <div class="absolute top-0 left-0 w-full h-full">
+        <div class="glow-sphere sphere-1"></div>
+        <div class="glow-sphere sphere-2"></div>
+      </div>
+
+      <div class="relative z-10 max-w-7xl mx-auto px-6 text-center reveal-down">
+        <h1 class="text-5xl md:text-6xl font-black text-white mb-6 tracking-tight">
+          Agency <span class="text-blue-500 text-glow">Journal</span>
+        </h1>
+        <p class="text-xl text-blue-100/80 max-w-2xl mx-auto font-light leading-relaxed">
+          Stay updated with the latest regulations, travel alerts, and property market insights directly from our agents in Ethiopia.
         </p>
       </div>
     </section>
 
-    <!-- NEWS LIST -->
-    <section class="max-w-7xl mx-auto px-6 py-16">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <section class="max-w-7xl mx-auto px-6 py-24">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
         <div
           v-for="(news, index) in paginatedItems"
           :key="news.id"
-          class="bg-white rounded-xl shadow overflow-hidden transform transition hover:scale-105 opacity-0"
-          :style="{ animationDelay: `${index * 0.2}s`, animation: 'fadeIn 0.8s forwards' }"
+          class="group bg-white rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:border-blue-200 transition-all duration-500 overflow-hidden flex flex-col reveal-card"
+          :style="{ animationDelay: `${index * 150}ms` }"
         >
-          <!-- IMAGE -->
-          <img v-if="news.image" :src="news.image" alt="" class="w-full h-48 object-cover">
-
-          <!-- CONTENT -->
-          <div class="p-6">
-            <p class="text-sm text-gray-400 mb-2">{{ formatDate(news.created_at) }}</p>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ news.title }}</h2>
-            <p class="text-gray-700 mb-4">{{ truncateContent(news.content, 120) }}</p>
-
-            <!-- VIDEO BELOW DESCRIPTION -->
-            <video
-              v-if="news.video"
-              controls
-              class="w-full h-48 object-cover mb-4"
+          <div class="relative h-64 overflow-hidden">
+            <div class="absolute inset-0 bg-blue-600/10 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <img 
+              v-if="news.image" 
+              :src="news.image" 
+              alt="News cover" 
+              class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
             >
-              <source :src="news.video" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <div class="absolute top-4 left-4 z-20">
+              <span class="bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                {{ news.category || 'Update' }}
+              </span>
+            </div>
+          </div>
 
-            <router-link :to="`/news/${news.id}`" class="text-royal-blue font-medium hover:underline">
-              Read more →
-            </router-link>
+          <div class="p-8 flex flex-col flex-grow">
+            <div class="flex items-center gap-2 text-blue-500 font-bold text-xs uppercase mb-3">
+               <i class="fa-regular fa-calendar"></i>
+               {{ formatDate(news.created_at) }}
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors leading-snug">
+              {{ news.title }}
+            </h2>
+            
+            <p class="text-gray-500 text-lg leading-relaxed mb-6">
+              {{ truncateContent(news.content, 110) }}
+            </p>
+
+            <div v-if="news.video" class="mb-6 rounded-xl overflow-hidden border border-gray-100 shadow-inner">
+              <video controls class="w-full h-40 object-cover">
+                <source :src="news.video" type="video/mp4" />
+              </video>
+            </div>
+
+            <div class="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
+              <router-link :to="`/news/${news.id}`" class="text-blue-600 font-bold flex items-center gap-2 group/link">
+                Read Full Report 
+                <i class="fa-solid fa-arrow-right transform group-hover/link:translate-x-2 transition-transform"></i>
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- PAGINATION -->
-      <div class="mt-10 flex justify-center gap-3">
+      <div class="mt-20 flex justify-center items-center gap-4">
         <button
           @click="prevPage"
           :disabled="currentPage === 1"
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          class="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-600 transition-all disabled:opacity-30 shadow-sm"
         >
-          Previous
+          <i class="fa-solid fa-chevron-left"></i>
         </button>
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="goToPage(page)"
-          :class="['px-4 py-2 rounded font-medium', page === currentPage ? 'bg-royal-blue text-white' : 'bg-gray-200 hover:bg-gray-300']"
-        >
-          {{ page }}
-        </button>
+
+        <div class="flex gap-2">
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            @click="goToPage(page)"
+            :class="['w-12 h-12 rounded-full font-bold transition-all', 
+              page === currentPage ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-400']"
+          >
+            {{ page }}
+          </button>
+        </div>
+
         <button
           @click="nextPage"
           :disabled="currentPage === totalPages"
-          class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+          class="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-600 transition-all disabled:opacity-30 shadow-sm"
         >
-          Next
+          <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
     </section>
 
-    <!-- FOOTER -->
     <AppFooter />
   </div>
 </template>
@@ -89,7 +115,65 @@ export default {
   components: { AppHeader, AppFooter },
   data() {
     return {
-      items: [],
+      // PRO SAMPLE DATA
+      items: [
+        {
+          id: 1,
+          title: "New ID Requirements for Diaspora Property Owners",
+          category: "Legal",
+          content: "The Ethiopian Ministry of Justice has issued new directives regarding power of attorney and property ownership verification for citizens living abroad...",
+          created_at: "2024-03-20",
+          image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80",
+        },
+        {
+          id: 2,
+          title: "Simplified Passport Renewal for Ethiopian Diaspora",
+          category: "Travel",
+          content: "Our agents have confirmed a new streamlined process at the Main Department for Immigration. Learn how you can renew through our representation services...",
+          created_at: "2024-03-18",
+          image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80",
+        },
+        {
+          id: 3,
+          title: "Real Estate Market Update: Addis Ababa Q1 2024",
+          category: "Market",
+          content: "Rental prices in Bole and Kazanchis are showing a steady 12% increase. Our property management team breaks down what this means for investors...",
+          created_at: "2024-03-15",
+          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+        },
+         {
+          id: 4,
+          title: "Simplified Passport Renewal for Ethiopian Diaspora",
+          category: "Travel",
+          content: "Our agents have confirmed a new streamlined process at the Main Department for Immigration. Learn how you can renew through our representation services...",
+          created_at: "2024-03-18",
+          image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80",
+        },
+        {
+          id: 5,
+          title: "Real Estate Market Update: Addis Ababa Q1 2024",
+          category: "Market",
+          content: "Rental prices in Bole and Kazanchis are showing a steady 12% increase. Our property management team breaks down what this means for investors...",
+          created_at: "2024-03-15",
+          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+        },
+         {
+          id: 6,
+          title: "Simplified Passport Renewal for Ethiopian Diaspora",
+          category: "Travel",
+          content: "Our agents have confirmed a new streamlined process at the Main Department for Immigration. Learn how you can renew through our representation services...",
+          created_at: "2024-03-18",
+          image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80",
+        },
+        {
+          id: 7,
+          title: "Real Estate Market Update: Addis Ababa Q1 2024",
+          category: "Market",
+          content: "Rental prices in Bole and Kazanchis are showing a steady 12% increase. Our property management team breaks down what this means for investors...",
+          created_at: "2024-03-15",
+          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+        }
+      ],
       currentPage: 1,
       perPage: 6,
     };
@@ -103,64 +187,56 @@ export default {
       return this.items.slice(start, start + this.perPage);
     },
   },
-  async mounted() {
-    await this.fetchNews();
-  },
   methods: {
-    async fetchNews() {
-      try {
-        const params = { page: this.currentPage, perPage: this.perPage };
-        const response = await this.$apiGet("/news", params);
-        this.items = response.data || [];
-      } catch (err) {
-        console.error("Failed to fetch news:", err);
-      }
-    },
     formatDate(dateStr) {
-      const options = { year: "numeric", month: "long", day: "numeric" };
+      const options = { year: "numeric", month: "short", day: "numeric" };
       return new Date(dateStr).toLocaleDateString(undefined, options);
     },
     truncateContent(content, length = 120) {
-      if (!content) return "";
       return content.length > length ? content.slice(0, length) + "..." : content;
     },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.fetchNews();
-      }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-        this.fetchNews();
-      }
-    },
-    goToPage(page) {
-      this.currentPage = page;
-      this.fetchNews();
-    },
+    prevPage() { if (this.currentPage > 1) this.currentPage--; },
+    nextPage() { if (this.currentPage < this.totalPages) this.currentPage++; },
+    goToPage(page) { this.currentPage = page; },
   },
 };
 </script>
 
 <style scoped>
-.bg-royal-blue {
-  background-color: #0052cc;
-}
-.text-royal-blue {
-  color: #0052cc;
+/* HERO ANIMATIONS */
+.reveal-down {
+  animation: slideDown 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Fade-in animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-30px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* CARD REVEAL ANIMATION */
+.reveal-card {
+  opacity: 0;
+  animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* GLOW SPHERES */
+.glow-sphere {
+  position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; pointer-events: none;
+}
+.sphere-1 { width: 500px; height: 500px; background: #2563eb; top: -10%; left: -5%; animation: drift 15s infinite alternate; }
+.sphere-2 { width: 400px; height: 400px; background: #0ea5e9; bottom: -10%; right: -5%; animation: drift 10s infinite alternate-reverse; }
+
+@keyframes drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(50px, 30px); }
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
 }
 </style>

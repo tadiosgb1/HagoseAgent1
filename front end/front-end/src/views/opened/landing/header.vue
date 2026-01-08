@@ -1,119 +1,45 @@
 <template>
-  <header class="bg-white shadow fixed w-full top-0 left-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+  <header class="bg-white/90 backdrop-blur-md shadow-sm fixed w-full top-0 left-0 z-50 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
 
-      <!-- LOGO -->
-      <router-link to="/" class="text-2xl font-extrabold text-royal-blue">
-        Alina <span class="text-gold">Agent</span>
+      <router-link to="/" class="flex items-center gap-3 group">
+        <img src="../../../assets/img/hlogo.jpg" alt="Hagos Logo" class="h-12 w-auto object-contain transition-transform group-hover:scale-105" />
+        <div class="flex flex-col">
+          <span class="text-xl font-black text-blue-600 leading-none">HAGOS</span>
+          <span class="text-[10px] tracking-[0.2em] font-bold text-gray-400 uppercase leading-none">Agent Service</span>
+        </div>
       </router-link>
 
-      <!-- DESKTOP MENU -->
-      <nav class="hidden md:flex items-center space-x-8 text-gray-700 font-medium">
-
-        <router-link to="/" class="hover:text-royal-blue transition">Home</router-link>
-        <router-link to="/about" class="hover:text-royal-blue transition">About</router-link>
-
-        <!-- SERVICES DROPDOWN -->
-        <div class="relative" @mouseleave="servicesOpen = false">
-          <button
-            @mouseover="servicesOpen = true"
-            class="hover:text-royal-blue transition flex items-center gap-1"
-          >
-            Services <i class="fas fa-chevron-down text-sm"></i>
-          </button>
-
-          <div
-            v-if="servicesOpen"
-            class="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 border border-gray-200"
-          >
-            <router-link
-              v-for="(service, idx) in services"
-              :key="idx"
-              :to="service.link"
-              class="block px-4 py-2 hover:bg-royal-blue/10 hover:text-royal-blue transition"
-            >
-              {{ service.name }}
-            </router-link>
-          </div>
-        </div>
-
-        <router-link to="/news" class="hover:text-royal-blue transition">News</router-link>
-        <router-link to="/events" class="hover:text-royal-blue transition">Events</router-link>
-
-        <router-link to="/contact" class="hover:text-royal-blue transition">Contact</router-link>
+      <nav class="hidden md:flex items-center space-x-10">
+        <router-link to="/" class="nav-item" exact-active-class="active-link">Home</router-link>
+        <router-link to="/about" class="nav-item" active-class="active-link">About</router-link>
+        <router-link to="/services" class="nav-item" active-class="active-link">Services</router-link>
+        <router-link to="/news" class="nav-item" active-class="active-link">News</router-link>
+        <router-link to="/events" class="nav-item" active-class="active-link">Events</router-link>
+        <router-link to="/contact-us" class="nav-item" active-class="active-link">Contact</router-link>
       </nav>
 
-      <!-- CTA BUTTONS -->
-      <div class="hidden md:flex space-x-4">
-        <router-link
-          to="/login"
-          class="px-5 py-2 bg-gray-100 rounded-lg text-gray-900 hover:bg-gray-200 font-medium transition"
-        >
-          Login
-        </router-link>
-
-        <router-link
-          to="/register"
-          class="px-5 py-2 bg-royal-blue text-white rounded-lg hover:bg-blue-700 font-medium transition"
-        >
+      <div class="hidden md:block">
+        <router-link to="/register" class="bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-md hover:shadow-blue-200">
           Get Started
         </router-link>
       </div>
 
-      <!-- MOBILE MENU BUTTON -->
-      <button @click="mobileMenu = !mobileMenu" class="md:hidden text-gray-700 text-3xl">
-        ☰
+      <button @click="mobileMenu = !mobileMenu" class="md:hidden text-gray-700 text-2xl focus:outline-none">
+        <i :class="mobileMenu ? 'fas fa-times' : 'fas fa-bars'"></i>
       </button>
     </div>
 
-    <!-- MOBILE MENU -->
-    <div v-if="mobileMenu" class="md:hidden bg-white shadow-lg px-6 py-4 space-y-4 text-gray-800">
-
-      <router-link to="/" @click="closeMenu" class="block">Home</router-link>
-      <router-link to="/about" @click="closeMenu" class="block">About</router-link>
-
-      <!-- SERVICES COLLAPSE MOBILE -->
-      <div>
-        <button
-          @click="mobileServices = !mobileServices"
-          class="w-full flex justify-between items-center py-2 font-medium border-b border-gray-200"
-        >
-          Services <i :class="mobileServices ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
-        </button>
-        <div v-if="mobileServices" class="pl-4 mt-2 space-y-1">
-          <router-link
-            v-for="(service, idx) in services"
-            :key="idx"
-            :to="service.link"
-            @click="closeMenu"
-            class="block py-1 hover:text-royal-blue transition"
-          >
-            {{ service.name }}
-          </router-link>
-        </div>
+    <transition name="fade">
+      <div v-if="mobileMenu" class="md:hidden bg-white border-t border-gray-100 px-6 py-6 flex flex-col space-y-4 shadow-xl">
+        <router-link to="/" @click="closeMenu" class="mobile-nav-item" exact-active-class="mobile-active">Home</router-link>
+        <router-link to="/about" @click="closeMenu" class="mobile-nav-item" active-class="mobile-active">About</router-link>
+        <router-link to="/services" @click="closeMenu" class="mobile-nav-item" active-class="mobile-active">Services</router-link>
+        <router-link to="/news" @click="closeMenu" class="mobile-nav-item" active-class="mobile-active">News</router-link>
+        <router-link to="/events" @click="closeMenu" class="mobile-nav-item" active-class="mobile-active">Events</router-link>
+        <router-link to="/contact-us" @click="closeMenu" class="mobile-nav-item" active-class="mobile-active">Contact</router-link>
       </div>
-
-      <router-link to="/news" @click="closeMenu" class="block">News</router-link>
-      <router-link to="/events" @click="closeMenu" class="block">Events</router-link>
-      <router-link to="/contact" @click="closeMenu" class="block">Contact</router-link>
-
-      <div class="border-t pt-4 space-y-3">
-        <router-link
-          to="/login"
-          @click="closeMenu"
-          class="block bg-gray-100 px-4 py-2 rounded-lg text-gray-900"
-        >
-          Login
-        </router-link>
-        <router-link
-          to="/register"
-          @click="closeMenu"
-          class="block bg-royal-blue text-white px-4 py-2 rounded-lg"
-        >
-          Get Started
-        </router-link>
-      </div>
-    </div>
+    </transition>
   </header>
 </template>
 
@@ -122,35 +48,71 @@ export default {
   data() {
     return {
       mobileMenu: false,
-      servicesOpen: false,
-      mobileServices: false,
-      services: [
-        { name: "Document Assistance", link: "/services/document-assistance" },
-        { name: "Payments & Transactions", link: "/services/payments" },
-        { name: "Errands & Representation", link: "/services/errands" },
-        { name: "Property Support", link: "/services/property" },
-        { name: "Appointments & Scheduling", link: "/services/appointments" },
-        { name: "Information & Research", link: "/services/research" },
-        { name: "Passport & Travel Assistance", link: "/services/passport" },
-      ],
     };
   },
   methods: {
     closeMenu() {
       this.mobileMenu = false;
-      this.mobileServices = false;
     },
   },
 };
 </script>
 
 <style scoped>
-.text-royal-blue { color: #0052cc; }
-.text-gold { color: #D4AF37; }
-.bg-royal-blue { background-color: #0052cc; }
+/* Base Nav Item Styles */
+.nav-item {
+  position: relative;
+  font-weight: 600;
+  color: #4b5563; /* gray-600 */
+  transition: color 0.3s ease;
+  padding: 4px 0;
+}
 
-/* Dropdown smooth animation */
-nav > div.relative > div {
-  transition: all 0.2s ease;
+.nav-item:hover {
+  color: #2563eb; /* blue-600 */
+}
+
+/* The Active Style (Horizontal Line) */
+.active-link {
+  color: #2563eb !important;
+}
+
+.active-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #2563eb;
+  border-radius: 2px;
+  animation: expandLine 0.3s ease-out forwards;
+}
+
+/* Mobile Active Styles */
+.mobile-nav-item {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  padding: 8px 0;
+}
+.mobile-active {
+  color: #2563eb;
+  border-left: 4px solid #2563eb;
+  padding-left: 12px;
+}
+
+@keyframes expandLine {
+  from { width: 0; left: 50%; }
+  to { width: 100%; left: 0; }
+}
+
+/* Fade Transition for Mobile Menu */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

@@ -1,108 +1,180 @@
 <template>
-  <section class="relative overflow-hidden py-28 bg-white">
-
-    <!-- BACKGROUND GRADIENT + PATTERN -->
-    <div class="absolute inset-0 bg-gradient-to-br from-royal-blue/30 via-white/50 to-dark-navy/30"></div>
-    <div class="absolute inset-0 opacity-10 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')]"></div>
-
-    <!-- FLOATING SHAPES -->
-    <div class="floating-circle bg-gold/30 top-20 left-16"></div>
-    <div class="floating-circle bg-royal-blue/20 bottom-32 right-20"></div>
-
-    <!-- CONTENT -->
-    <div class="relative z-10 max-w-5xl mx-auto px-6 text-center animate-fadeIn">
-
-      <h1 class="text-5xl md:text-6xl font-black text-dark-navy leading-tight drop-shadow-sm">
-        Your Trusted Support Service in <span class="text-royal-blue">Ethiopia</span>
-      </h1>
-
-      <p class="mt-6 text-lg text-gray-700 max-w-3xl mx-auto">
-        Alina Agent Service helps you complete important tasks efficiently — from document processing, payments, deliveries, and office follow-ups, to property and travel support. We handle everything with speed, safety, and professionalism.
-      </p>
-
-      <!-- CTA BUTTONS -->
-      <div class="mt-10 flex flex-wrap justify-center gap-5">
-        <router-link
-          to="/register"
-          class="bg-royal-blue hover:bg-dark-navy text-white px-10 py-4 text-lg font-semibold rounded-xl shadow-lg transition transform hover:scale-105"
+  <section class="relative h-[90vh] w-full overflow-hidden bg-slate-950">
+    <div class="absolute inset-0 z-0">
+      <transition-group name="fade-ken-burns">
+        <div 
+          v-for="(slide, index) in slides" 
+          :key="slide.id"
+          v-show="currentSlide === index"
+          class="absolute inset-0"
         >
-          Get Started
-        </router-link>
+          <div 
+            class="absolute inset-0 bg-cover bg-center scale-animation"
+            :style="{ backgroundImage: `url(${slide.image})` }"
+          ></div>
+          <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/40 to-transparent"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+        </div>
+      </transition-group>
+    </div>
 
-        <router-link
-          to="/login"
-          class="bg-white text-dark-navy border border-gray-300 px-10 py-4 text-lg font-semibold rounded-xl shadow-md hover:bg-gray-100 transition"
-        >
-          Login
-        </router-link>
+    <div class="relative z-10 h-full max-w-7xl mx-auto px-6 flex items-center">
+      <div class="max-w-3xl">
+        <transition name="slide-fade-content" mode="out-in">
+          <div :key="currentSlide" class="space-y-6">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-400 text-xs font-bold uppercase tracking-[0.2em] animate-pulse">
+              {{ slides[currentSlide].tag }}
+            </span>
+            
+            <h1 class="text-5xl md:text-7xl font-black text-white leading-tight">
+              {{ slides[currentSlide].titlePart1 }} <br />
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                {{ slides[currentSlide].titlePart2 }}
+              </span>
+            </h1>
+
+            <p class="text-xl text-slate-300/80 leading-relaxed font-light max-w-xl">
+              {{ slides[currentSlide].description }}
+            </p>
+
+            <div class="flex flex-wrap gap-5 pt-6">
+              <button class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full transition-all hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:-translate-y-1 active:scale-95">
+                Start Errand Now
+              </button>
+              <button class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 font-bold rounded-full transition-all active:scale-95">
+                Our Services
+              </button>
+            </div>
+          </div>
+        </transition>
       </div>
+    </div>
 
-      <!-- STAT BAR -->
-      <div class="mt-14 flex flex-wrap justify-center gap-14 text-center">
-        <div class="animate-slideUpDelay1">
-          <p class="text-4xl font-extrabold text-royal-blue">+10,000</p>
-          <p class="text-gray-700 text-sm">Tasks Completed</p>
-        </div>
+    <div class="absolute bottom-12 right-6 md:right-12 z-20 flex flex-col gap-4">
+      <button 
+        v-for="(slide, index) in slides" 
+        :key="'indicator-' + slide.id"
+        @click="goToSlide(index)"
+        class="group flex items-center justify-end gap-4"
+      >
+        <span :class="['text-xs font-bold transition-all duration-500', currentSlide === index ? 'text-white translate-x-0 opacity-100' : 'text-white/20 translate-x-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-0']">
+          0{{ index + 1 }}
+        </span>
+        <div :class="['h-[2px] transition-all duration-700', currentSlide === index ? 'w-16 bg-blue-500' : 'w-8 bg-white/20 group-hover:bg-white/50']"></div>
+      </button>
+    </div>
 
-        <div class="animate-slideUpDelay2">
-          <p class="text-4xl font-extrabold text-gold">99.8%</p>
-          <p class="text-gray-700 text-sm">On-Time Delivery</p>
-        </div>
-
-        <div class="animate-slideUpDelay3">
-          <p class="text-4xl font-extrabold text-royal-blue">4.97★</p>
-          <p class="text-gray-700 text-sm">Client Satisfaction</p>
-        </div>
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 pb-8 hidden md:block">
+      <div class="w-[1px] h-20 bg-gradient-to-b from-transparent via-blue-500 to-transparent relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1/2 bg-white animate-scroll-line"></div>
       </div>
-
     </div>
   </section>
 </template>
 
 <script>
 export default {
-  name: "HeroSection",
+  name: "HeroComponent",
+  data() {
+    return {
+      currentSlide: 0,
+      autoPlayInterval: null,
+      slides: [
+        {
+          id: 1,
+          tag: "Your Local Hands",
+          titlePart1: "Reliable Agency",
+          titlePart2: "In Addis Ababa",
+          description: "Distance is no longer a barrier. We process your documents, handle payments, and represent your interests locally with absolute integrity.",
+          image: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1920&q=80"
+        },
+        {
+          id: 2,
+          tag: "Property Expert",
+          titlePart1: "Real Estate",
+          titlePart2: "Representation",
+          description: "From property follow-ups to construction monitoring, our agents provide high-definition video updates on your investments.",
+          image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80"
+        },
+        {
+          id: 3,
+          tag: "Legal & Logistics",
+          titlePart1: "Fast Document",
+          titlePart2: "Authentication",
+          description: "Skip the travel. We handle embassy paperwork, passport renewals, and power of attorney signatures on your behalf.",
+          image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1920&q=80"
+        }
+      ]
+    };
+  },
+  mounted() {
+    this.startAutoPlay();
+  },
+  beforeUnmount() {
+    this.stopAutoPlay();
+  },
+  methods: {
+    startAutoPlay() {
+      this.autoPlayInterval = setInterval(() => {
+        this.nextSlide();
+      }, 7000);
+    },
+    stopAutoPlay() {
+      clearInterval(this.autoPlayInterval);
+    },
+    nextSlide() {
+      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+    },
+    goToSlide(index) {
+      this.currentSlide = index;
+      this.stopAutoPlay();
+      this.startAutoPlay();
+    }
+  }
 };
 </script>
 
 <style scoped>
-/* Brand Colors */
-.text-royal-blue { color: #0052cc; }
-.bg-royal-blue { background-color: #0052cc; }
-.text-dark-navy { color: #0A1A2F; }
-.bg-dark-navy { background-color: #0A1A2F; }
-.text-gold { color: #D4AF37; }
-.bg-gold { background-color: #D4AF37; }
-
-/* Fade-in main content */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fadeIn {
-  animation: fadeIn 1.2s ease forwards;
+/* KEN BURNS ANIMATION */
+.scale-animation {
+  animation: kenburns 20s ease infinite alternate;
 }
 
-/* Floating circles */
-.floating-circle {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  border-radius: 9999px;
-  filter: blur(40px);
-  animation: float 8s ease-in-out infinite;
-}
-@keyframes float {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-20px, -30px); }
+@keyframes kenburns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.15); }
 }
 
-/* Stats sliding */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+/* TRANSITIONS */
+.fade-ken-burns-enter-active, .fade-ken-burns-leave-active {
+  transition: opacity 1.5s ease-in-out;
 }
-.animate-slideUpDelay1 { animation: slideUp 1s ease forwards 0.7s; opacity: 0; }
-.animate-slideUpDelay2 { animation: slideUp 1s ease forwards 1.0s; opacity: 0; }
-.animate-slideUpDelay3 { animation: slideUp 1s ease forwards 1.3s; opacity: 0; }
+.fade-ken-burns-enter-from, .fade-ken-burns-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-content-enter-active {
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+}
+.slide-fade-content-leave-active {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-fade-content-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(10px);
+}
+.slide-fade-content-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+/* SCROLL LINE ANIMATION */
+@keyframes scroll-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.animate-scroll-line {
+  animation: scroll-line 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
 </style>
