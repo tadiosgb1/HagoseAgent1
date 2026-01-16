@@ -1,24 +1,67 @@
-const { User, Role, Permission, Op } = require("../models");
-
+const { User, Role, Permission} = require("../models");
+const { Op } = require("sequelize");
 module.exports = {
-  async getAll(req, res) {
-    try {
-      let page = parseInt(req.query.page) || 1;
-      let page_size = parseInt(req.query.page_size) || 10;
-      let search = req.query.search || "";
-      let ordering = req.query.ordering || "id";
-      if (page < 1) page = 1;
-      if (page_size < 1) page_size = 10;
-      const searchFields = [{ first_name: { [Op.like]: '%' + search + '%' } }, { middle_name: { [Op.like]: '%' + search + '%' } }, { last_name: { [Op.like]: '%' + search + '%' } }, { phone: { [Op.like]: '%' + search + '%' } }, { email: { [Op.like]: '%' + search + '%' } }];
-      const where = search ? { [Op.or]: searchFields } : {};
-      const order = ordering.startsWith("-") ? [[ordering.slice(1), "DESC"]] : [[ordering, "ASC"]];
-      const offset = (page - 1) * page_size;
-      const { rows, count } = await User.findAndCountAll({ where, order, offset, limit: page_size, include: [Role, Permission] });
-      const baseUrl = `${req.protocol}://${req.get("host")}${req.path}`;
-      const total_pages = Math.ceil(count / page_size);
-      res.json({ count, total_pages, current_page: page, next: page < total_pages ? `${baseUrl}?page=${page + 1}&page_size=${page_size}` : null, previous: page > 1 ? `${baseUrl}?page=${page - 1}&page_size=${page_size}` : null, page_size, data: rows });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-  },
+async getAll(req, res) {
+  try {
+    let page = parseInt(req.query.page) || 1;
+    let page_size = parseInt(req.query.page_size) || 10;
+    let search = req.query.search || "";
+    let ordering = req.query.ordering || "id";
+
+    if (page < 1) page = 1;
+    if (page_size < 1) page_size = 10;
+
+    const where = search
+      ? {
+          [Op.or]: [
+            { first_name: { [Op.like]: `%${search}%` } },
+            { middle_name: { [Op.like]: `%${search}%` } },
+            { last_name: { [Op.like]: `%${search}%` } },
+            { phone: { [Op.like]: `%${search}%` } },
+            { email: { [Op.like]: `%${search}%` } }
+          ]
+        }
+      : {};
+
+    const order = ordering.startsWith("-")
+      ? [[ordering.slice(1), "DESC"]]
+      : [[ordering, "ASC"]];
+
+    const offset = (page - 1) * page_size;
+
+    const { rows, count } = await User.findAndCountAll({
+      where,
+      order,
+      offset,
+      limit: page_size,
+      include: [Role, Permission]
+    });
+
+    const baseUrl = `${req.protocol}://${req.get("host")}${req.path}`;
+    const total_pages = Math.ceil(count / page_size);
+
+    res.json({
+      count,
+      total_pages,
+      current_page: page,
+      next:
+        page < total_pages
+          ? `${baseUrl}?page=${page + 1}&page_size=${page_size}`
+          : null,
+      previous:
+        page > 1
+          ? `${baseUrl}?page=${page - 1}&page_size=${page_size}`
+          : null,
+      page_size,
+      data: rows
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
+  }
+}
+,
 
   async getOne(req, res) { try { const user = await User.findByPk(req.params.id, { include: [Role, Permission] }); if (!user) return res.status(404).json({ error: "Not found" }); res.json(user); } catch (e) { res.status(500).json({ error: e.message }); } },
 

@@ -4,12 +4,11 @@ const controller = require("../controllers/TestimonialController");
 
 const upload = require("../middleware/uploadMiddleware");
 const uploadFields = upload.fields([{ name: "avatar", maxCount: 1 }]);
-
-
-router.get("/", controller.getAll);
-router.get("/:id", controller.getOne);
-router.post("/", uploadFields, controller.create);
-router.put("/:id", uploadFields, controller.update);
-router.delete("/:id", controller.delete);
+const authMiddleware = require("../middleware/authMiddleware");
+router.get("/",  controller.getAll);
+router.get("/:id",controller.getOne);
+router.post("/", authMiddleware, uploadFields, controller.create);
+router.put("/:id", authMiddleware, uploadFields, controller.update);
+router.delete("/:id",authMiddleware, controller.delete);
 
 module.exports = router;

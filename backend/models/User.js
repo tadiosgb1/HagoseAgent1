@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     email: { type: DataTypes.STRING, unique: true },
     password: DataTypes.STRING,
-    avatar_url: DataTypes.STRING,
     resetToken: DataTypes.STRING,
     resetTokenExpiry: DataTypes.DATE
   });

@@ -6,21 +6,59 @@ const generateAccessToken = user => jwt.sign({ id: user.id }, process.env.ACCESS
 const generateRefreshToken = user => jwt.sign({ id: user.id }, process.env.REFRESH_SECRET, { expiresIn: "7d" });
 
 module.exports = {
-  register: async (req, res) => {
-    try {
-      const { first_name, middle_name, last_name, phone, email, password } = req.body;
-      if (!req.file) return res.status(400).send("Avatar required");
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ first_name, middle_name, last_name, phone, email, password: hashedPassword, avatar_url: req.file.path });
-      const accessToken = generateAccessToken(user);
-      const refreshToken = generateRefreshToken(user);
-      const userData = await User.findByPk(user.id, { include: [Role, Permission] });
-      const effectivePermissions = [...new Set([...userData.Roles.flatMap(r => r.Permissions.map(p => p.code)), ...userData.Permissions.map(p => p.code)])];
-      res.json({ id: user.id, email: user.email, roles: userData.Roles, permissions: effectivePermissions, accessToken, refreshToken });
-    } catch (e) { res.status(500).json({ error: e.message }); }
-  },
+register: async (req, res) => {
+  try {
+    const { first_name, middle_name, last_name, phone, email, password } = req.body;
+
+    // Basic validation
+    if (!first_name || !last_name || !email || !password) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      first_name,
+      middle_name,
+      last_name,
+      phone,
+      email,
+      password: hashedPassword
+    });
+
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    const userData = await User.findByPk(user.id, {
+      include: [Role, Permission]
+    });
+
+    const effectivePermissions = [
+      ...new Set([
+        ...userData.Roles.flatMap(r => r.Permissions.map(p => p.code)),
+        ...userData.Permissions.map(p => p.code)
+      ])
+    ];
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      roles: userData.Roles,
+      permissions: effectivePermissions,
+      accessToken,
+      refreshToken
+    });
+
+  } catch (e) {
+    console.log("error", e);
+    res.status(500).json({ error: e.message });
+  }
+},
 
   login: async (req, res) => {
+    
+    console.log("the login please");
+
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ where: { email }, include: [Role, Permission] });

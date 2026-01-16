@@ -5,11 +5,12 @@ const controller = require("../controllers/NewsController");
 const upload = require("../middleware/uploadMiddleware");
 const uploadFields = upload.fields([{ name: "image", maxCount: 1 }, { name: "video", maxCount: 1 }]);
 
+const authMiddleware = require("../middleware/authMiddleware");
 
 router.get("/", controller.getAll);
 router.get("/:id", controller.getOne);
-router.post("/", uploadFields, controller.create);
-router.put("/:id", uploadFields, controller.update);
-router.delete("/:id", controller.delete);
+router.post("/", authMiddleware,uploadFields, controller.create);
+router.put("/:id", authMiddleware,uploadFields, controller.update);
+router.delete("/:id",authMiddleware, controller.delete);
 
 module.exports = router;
